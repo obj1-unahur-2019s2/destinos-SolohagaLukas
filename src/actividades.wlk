@@ -12,6 +12,11 @@ class Viaje {
 	method esInteresante() {
 		return idioma.size() > 1
 	}
+	method esRecomendada(socio) {
+		return self.esInteresante() and
+		socio.leAtrae(self) and
+		not socio.realizoActividad(self)
+	}
 }
 
 class Playa inherits Viaje {
@@ -19,7 +24,7 @@ class Playa inherits Viaje {
 	 override method dias() {
 	 	return largoDePlaya / 500
 	 }
-	 override method implicaEsfuerzo () {
+	 override method implicaEsfuerzo() {
 	 	return largoDePlaya > 1200
 	 }
 	 override method bronceador () { return true }
@@ -70,4 +75,45 @@ class ClaseDeGimnasia inherits Viaje {
 	override method dias() { return 1 }
 	override method implicaEsfuerzo() { return true }
 	override method bronceador() { return false }
+	override method esRecomendada(socio) {
+		return socio.edad().between(20, 30)
+	}
+}
+
+class TallerLiterario {
+	var property libros = #{}
+	
+	method agregarLibro(book) {
+		libros.add(book)
+	}
+	method idioma() {
+		return libros.map({ l => l.idioma()}).asSet()
+	}
+	method dias() {
+		return libros.size() + 1
+	}
+	method implicaEsfuerzo() {
+		return ( self.hayMasDe500()
+		or self.todosMismoAutor() )
+		and libros.size() > 1 
+	}
+	method hayMasDe500() {
+		return libros.any({ l => l.paginas() > 500 })
+	}
+	method todosMismoAutor() {
+		return self.autores().size() < 2
+	}
+	method autores() {
+		return libros.map({ l => l.autor() }).asSet()
+	}
+	method bronceador() { return false }
+	method esRecomendado(socio) {
+		return socio.idioma().size() > 1
+	}
+}
+
+class Libro {
+	 var property idioma
+	 var property paginas
+	 var property autor
 }
